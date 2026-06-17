@@ -4,12 +4,83 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg: #FAFBFC;
+  --card: #FFFFFF;
+  --primary: #2563EB;
+  --text: #0F172A;
+  --text-secondary: #64748B;
+  --border: #E2E8F0;
+  --success: #16A34A;
+  --error: #DC2626;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #020617;
+  --card: #0F172A;
+  --primary: #2563EB;
+  --text: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --border: #334155;
+  --success: #16A34A;
+  --error: #DC2626;
+  color-scheme: dark;
+}
+
 * {
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background-color: #F8FAFC;
+  background-color: var(--bg);
+  color: var(--text);
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
+
+/* Scrollbar customization */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Shimmer animation for loading states */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--card) 25%,
+    var(--border) 50%,
+    var(--card) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite linear;
+}
+
