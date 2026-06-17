@@ -1,20 +1,27 @@
 from fastapi import APIRouter, HTTPException
 
+from app.schemas.ask_schema import (
+    QuestionRequest,
+    AnswerResponse,
+)
+
 from app.storage.document_store import get_document
-from app.services.ai_service import generate_summary
-from app.schemas.summary_schema import SummaryResponse
+from app.services.ai_service import answer_question
 
 router = APIRouter(
-    prefix="/summary",
-    tags=["Summary"]
+    prefix="/ask",
+    tags=["Ask"]
 )
 
 
 @router.post(
     "/{document_id}",
-    response_model=SummaryResponse
+    response_model=AnswerResponse
 )
-async def summarize(document_id: str):
+async def ask_question(
+    document_id: str,
+    request: QuestionRequest
+):
 
     text = get_document(document_id)
 
@@ -25,7 +32,10 @@ async def summarize(document_id: str):
         )
 
     try:
-        return generate_summary(text)
+        return answer_question(
+            text=text,
+            question=request.question
+        )
 
     except Exception:
         raise HTTPException(

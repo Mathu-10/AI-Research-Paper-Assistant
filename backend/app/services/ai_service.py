@@ -3,7 +3,7 @@ import json
 
 from dotenv import load_dotenv
 from google import genai
-
+from app.schemas.ask_schema import AnswerResponse
 from app.schemas.summary_schema import SummaryResponse
 
 load_dotenv()
@@ -51,3 +51,43 @@ Research Paper:
     data = json.loads(result)
 
     return SummaryResponse(**data)
+
+def answer_question(text: str, question: str) -> AnswerResponse:
+    """
+    Answer a question using the uploaded research paper.
+    """
+
+    prompt = f"""
+You are an AI research assistant.
+
+Answer ONLY using the information available in the research paper.
+
+If the answer is not available, reply:
+
+"The research paper does not provide enough information to answer this question."
+
+Research Paper:
+
+{text[:15000]}
+
+Question:
+
+{question}
+"""
+
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt,
+    )
+
+    return AnswerResponse(
+        answer=response.text.strip()
+    )
+    try:
+        data = json.loads(result)
+        return AnswerResponse(**data)
+    except Exception as e:
+        print("RAW GEMINI RESPONSE:")
+        print(result)
+    print("ERROR:", e)
+    raise
