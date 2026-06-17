@@ -1,6 +1,10 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-
-from app.services.pdf_service import save_pdf
+from app.utils.file_utils import is_pdf
+from app.schemas.upload_schema import UploadResponse
+from app.services.pdf_service import (
+    save_pdf,
+    extract_pdf_content,
+    )
 from app.utils.file_utils import is_pdf, get_file_path
 
 router = APIRouter(
@@ -9,11 +13,14 @@ router = APIRouter(
 )
 
 
-@router.post("/")
+@router.post(
+    "/",
+    response_model=UploadResponse
+)
 async def upload_pdf(file: UploadFile = File(...)):
     """
     Upload a research paper.
-    """
+    """ 
 
     if not is_pdf(file):
         raise HTTPException(
@@ -21,9 +28,15 @@ async def upload_pdf(file: UploadFile = File(...)):
             detail="Only PDF files are allowed."
         )
 
-    filename = await save_pdf(file)
+    saved_path = await save_pdf(file)
 
-    return {
-        "filename": filename,
-        "message": "File uploaded successfully!"
-    }
+    pdf_content = extract_pdf_content(saved_path)
+
+    preview = pdf_content["text"][:500]
+
+    return UploadResponse(
+    filename=file.filename,
+    pages=pdf_content["pages"],
+    preview=preview,
+    message="PDF uploaded successfully."
+)
